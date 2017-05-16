@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html language="ja">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<script type="text/javascript" src="common/fps.js"></script>
+		<script type="text/javascript">
+
+			var canvas;
+			var ctx;
+			var fps = new FPS(60);
+			var waves = [];
+			window.onload= function() {
+				init();
+			}
+
+			function init() {
+				canvas = document.getElementById("canvas");
+				ctx = canvas.getContext("2d");
+        		ctx.globalCompositeOperation = "lighter";
+				makeObj();
+				drawBackground();
+				mainloop();
+			}
+			function mainloop() {
+				fps.check();
+				drawBackground();
+        		update();
+				draw();
+				fps.show();
+				setTimeout(mainloop, fps.getInterval());
+			}
+
+			function drawBackground() {
+				ctx.fillStyle = "rgba(0,0,0,1.0)"; // black
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+			}
+
+
+			function makeObj() {
+				for (var i = 0; i < 5; i++) {
+					waves.push({
+						radius:Math.random() * 50,
+			            alpha:Math.random(),
+			            width:Math.random() * 5,
+			            x:0,
+			            dx:- (Math.random()),
+			            });
+					}
+			}
+			function update() {
+			  for (var i = 0; i < waves.length; i++) {
+			    waves[i].x += waves[i].dx;
+			  }
+			}
+			function draw() {
+				ctx.save();
+				ctx.translate(0, 250);
+				for (var i = 0; i < waves.length; i++) {
+          			var wave = waves[i];
+					ctx.beginPath();
+					ctx.strokeStyle = "rgba(84, 164, 212," + wave.alpha + ")";
+          			ctx.lineWidth = wave.width;
+
+          			var isFirst = true;
+			        for (var x = 0; x < canvas.width; x+=0.1) {
+			          if (isFirst) {
+			            ctx.moveTo(0, 0);
+			            isFirst = false;
+			            continue;
+			          }
+			          var y = Math.sin(x + wave.x);
+			          var xx = x * wave.radius;
+			          var yy = y * wave.radius;
+			          if (xx < 0 || xx > canvas.width) {
+			            continue;
+			          }
+			          ctx.lineTo(xx, yy);
+			        }
+					ctx.stroke();
+	          		ctx.closePath();
+        		}
+        		ctx.restore();
+			}
+
+		</script>
+	</head>
+
+	<body>
+		<canvas id="canvas" width="500px" height="500px"/>
+	</body>
+</html>

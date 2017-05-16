@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html language="ja">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<script type="text/javascript">
+		
+		var cx;
+		var cy;
+
+		var bullets = [];
+		var numBullets = 50;
+		
+		var canvas;
+		
+		window.onload = function() {
+			onInit();
+			setInterval(onFrame, 100);
+		};
+		
+		function onInit() {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+
+			cx = canvas.width * 0.5;
+			cy = canvas.height * 0.5;
+
+			makeBullets();
+			drawBackground();
+		}
+
+		var bulletMakeCount = 0;
+		function makeBullets() {
+			var divDegree = 360 / numBullets;
+			
+			for (var i = 0; i < numBullets; i++) {
+				var degree = divDegree * i;
+				switch (bulletMakeCount++ % 4)  {
+				case 0:
+					if (! (0 < degree && degree < 90)) {
+						continue;
+					}
+					break;
+				case 1:
+					if (! (90 < degree && degree < 180)) {
+						continue;
+					}
+					break;
+				case 2:
+					if (! (180 < degree && degree < 270)) {
+						continue;
+					}
+					break;
+				case 3:
+					if (! (270 < degree && degree < 360)) {
+						continue;
+					}
+					break;
+					
+				}
+				var angle = degree * Math.PI / 180;
+
+				var bullet = {
+					size:5,
+					lineWidth:5,
+					angle:angle,
+					cx:cx,
+					cy:cy,
+					dx:Math.cos(angle),
+					dy:Math.sin(angle),
+				}
+				bullet.dx *= bullet.size * 3;
+				bullet.dy *= bullet.size * 3;
+				bullets.push(bullet);
+			}
+		}
+		
+		function drawBackground() {
+			ctx.fillStyle = "rgb(12, 86, 147)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			ctx.lineWidth = 1;
+
+			ctx.strokeStyle = "white";
+			ctx.beginPath();
+			ctx.moveTo(canvas.width * 0.5, 0);
+			ctx.lineTo(canvas.width * 0.5, canvas.height);
+			ctx.stroke();
+			
+			ctx.beginPath();
+			ctx.moveTo(0, canvas.height * 0.5);
+			ctx.lineTo(1000, canvas.height * 0.5);
+			ctx.stroke();
+
+			ctx.strokeStyle = "white";
+			ctx.arc(cx, cy, canvas.width * 0.4, 0, Math.PI * 2, true);
+			ctx.stroke();
+			
+		}
+
+		function onUpdate() {
+
+			for (var i = 0; i < bullets.length; i++) {
+				var bullet = bullets[i];
+				if (bullet.cx - bullet.size < 0 || bullet.cx > canvas.width -bullet.size||
+					bullet.cy - bullet.size < 0 || bullet.cy > canvas.height - bullet.size) {
+					bullets.splice(i, 1);
+				}
+			}
+			
+			for (var i = 0; i < bullets.length; i++) {
+				var bullet = bullets[i];	
+				bullet.cx += bullet.dx;
+				bullet.cy += bullet.dy;
+			} 
+		}
+
+		var frameCount = 1;
+
+		function onDraw() {
+			drawBackground();
+			for (var i = 0; i < bullets.length; i++) {
+			
+				var bullet = bullets[i];
+					
+					ctx.lineWidth = bullet.lineWidth;
+					ctx.fillStyle = "rgba(255, 120, 100, 255)";
+					ctx.beginPath();
+					ctx.arc(bullet.cx, 
+							bullet.cy, 
+							bullet.size, 0, Math.PI * 2, true);
+					ctx.fill();
+				}
+			}
+		
+		function onFrame() {
+			if (frameCount++ % 3 === 0) {
+				makeBullets();
+			}
+			onUpdate();
+			onDraw();
+		}		
+		
+    </script>
+	
+	<canvas id="canvas" width="500" height="500">
+	
+	</canvas>
+</html>

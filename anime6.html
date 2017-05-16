@@ -1,0 +1,135 @@
+<html>
+<head>
+	<title>LigTop</title>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+<style type="text/css">
+body{
+	margin: 0;
+	padding: 0;
+}
+#wrap{
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 1500px;
+    /*min-height: 100%;*/
+    background-color: #454B79;
+}
+#contents{
+	width: 960px;
+	margin: auto;
+	height: 100%;
+	background-color: #6D8CD0;
+}
+#top_scroll_block{
+	position: fixed;
+	bottom: 0px;
+	right: 0px;
+	margin-bottom: -200px;
+}
+#top_scroll_link:hover{
+	display: inline-block;
+	animation: rumble 0.12s linear infinite;
+}
+@keyframes rumble{
+	0%	{transform:rotate(0deg)	translate(0,0);}
+	12.5%	{transform:rotate(0.4deg)	translate(1px,-1px);}
+	25%	{transform:rotate(0.8deg)	translate(0px,1px);}
+	37.5%	{transform:rotate(0.4deg)	translate(-1px,0);}
+	50%	{transform:rotate(0deg)	translate(0,0);}
+	62.5%	{transform:rotate(-0.4deg)	translate(1px,0);}
+	75%	{transform:rotate(-0.8deg)	translate(0,1px);}
+	87.5%	{transform:rotate(-0.4deg)	translate(-1px,-1px);}
+	100%	{transform:rotate(0deg)	translate(0,0);}
+}
+</style>
+<script type="text/javascript">
+$(function(){
+	$("#top_scroll_link").on('click',function(){
+		AnimationObj.wGit.init();
+	});
+	$("#top_scroll_block").hover(
+	  function () {
+		  $("#top_scroll_block").animate({"margin-bottom": "-150px"});
+	  },
+	  function () {
+		  $("#top_scroll_block").animate({"margin-bottom": "-200px"});
+	  }
+	);
+});
+var AnimationObj 	  = AnimationObj || {};
+AnimationObj.wGit = {
+	init: function InitAnimation(){
+		windowSway().then(pageTop);
+	}
+}
+
+AnimationObj.event = {
+
+}
+
+	//画面が動く
+	function windowSway(){
+
+		var d = new $.Deferred;
+
+		for (var i = 1; i <= 3; i++) {
+			$("#wrap").animate({
+				"margin-left" : 20*i+"px"
+			}, 250, 'swing',function(){
+				d.resolve();
+			});
+
+			$("#wrap").animate({
+				"margin-left" : "0px"
+			}, 250 / i, 'swing',function(){
+				d.resolve();
+			});
+
+			$("#wrap").animate({
+				"margin-left" : -20*i+"px"
+			}, 250 / i, 'swing',function(){
+				d.resolve();
+			});
+
+			$("#wrap").animate({
+				"margin-left" : "0px"
+			}, 250 / i, 'swing',function(){
+				d.resolve();
+			});
+		};
+		return d.promise();
+	}
+
+	function pageTop(){
+
+		var d = new $.Deferred;
+
+		$('body, html').animate({ scrollTop: 0 }, 1000);
+		var scrollIH = $("#scroll_image").height();
+		var scrollIW = $("#scroll_image").width();
+
+		var windowW = $(window).width();
+		var windowH = $(window).height();
+
+		$('#top_scroll_block').animate({
+			'bottom': windowH+scrollIH+"px",
+			'right': 200+scrollIW+"px",
+		}, 4000, 'swing',function(){
+			d.resolve();
+		});
+		return d.promise();
+	}
+</script>
+<body>
+<div id="wrap">
+	<div id="contents">
+		uedayo
+	</div>
+	<div id="top_scroll_block">
+		<p id="top_scroll_link"><img id="scroll_image" src="images/ender.png"></p>
+	</div>
+</div>
+</body>
+</html>

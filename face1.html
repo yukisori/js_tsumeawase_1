@@ -1,0 +1,106 @@
+<html>
+<head>
+	<title></title>
+</head>
+<style type="text/css">
+body { background-color: #DDDDDD; font: 16px sans-serif; }
+
+#file-image{
+    display:none;
+}
+.fileupImg{
+    margin: 10px;
+    height:25px;
+    width:100px;
+    color: white;
+    background-color: #23BECE;
+    padding: 5px;
+    font-size: 15px;
+    text-align: center;
+}
+
+</style>
+<body>
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src='http://rawgithub.com/liuliu/ccv/stable/js/ccv.js' type='text/javascript'></script>
+<script src='http://rawgithub.com/liuliu/ccv/stable/js/face.js' type='text/javascript'></script>
+<script type="text/javascript">
+
+
+var ctx;
+var img;
+var imgCh;
+var main = function () {
+    ctx = $("#canvas")[0].getContext('2d');
+    resizeCanvas(imgCh, canvas);
+    var s = (new Date()).getTime();
+    // 顔検出
+    var comp = ccv.detect_objects({
+        "canvas": ccv.grayscale(ccv.pre(imgCh)),
+        "cascade": cascade,
+        "interval": 5,
+        "min_neighbors": 1
+    });
+
+    if(!comp.length > 0){
+
+        showMessage("NG face");
+    }else{
+        showMessage("match face");
+    }
+    // 結果の表示
+    ctx.drawImage(imgCh, 0, 0);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#f00";
+    for (var i = 0; i < comp.length; i++) {
+        ctx.strokeRect(comp[i].x, comp[i].y, comp[i].width, comp[i].height);
+    }
+};
+
+
+$(function(){
+    $("#fileupImg").on("click", function(event){
+        $("input[name=img]").trigger("click");
+    });
+    $('#file-image').change(function(e){
+        showMessage("reading....");
+        var file = this.files[0];
+        imgCh = new Image();
+      //ファイルストリームからファイル出力
+      var fileReader = new FileReader();
+      fileReader.onload = function(event) {
+          imgCh.src = event.target.result;
+      };
+      fileReader.readAsDataURL(file);
+      //ロード処理がめんどくさいので適当に１秒後
+      setTimeout(main, 1000);
+    });
+});
+
+function showMessage(Msg){
+    document.getElementById("message").innerHTML = Msg;
+}
+function resizeCanvas(image, canvas) {
+    document.body.appendChild(image);
+    canvas.width = image.offsetWidth;
+    canvas.style.width = image.offsetWidth.toString() + "px";
+    canvas.height = image.offsetHeight;
+    canvas.style.height = image.offsetHeight.toString() + "px";
+    document.body.removeChild(image);
+}
+</script>
+<h1>顔検出</h1>
+<div id="msg"></div>
+<form action="./face1.html" method="post" enctype="multipart/form-data" >
+
+    <div id="fileupImg" class="fileupImg">upload</div>
+    <input type="file" accept='image/*' name="img" id="file-image">
+
+</form>
+<canvas id="canvas"></canvas>
+<div id="message"></div>
+
+
+</body>
+</html>

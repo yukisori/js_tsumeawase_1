@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html language="ja">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<script type="text/javascript" src="common/fps.js"></script>
+	<script type="text/javascript">
+		var canvas;
+		var ctx;
+		var point;
+		var fps = new FPS(60);
+		var reverseMode = false;
+		var sizeProgress = 0.2;
+		window.onload = function() {
+			onInit();
+			mainloop();
+		};
+		function onInit() {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+			ctx.globalAlpha = 0.6;
+			point = {
+				cx:canvas.width * 0.5,
+				cy:canvas.height * 0.5,
+				radian:Math.floor(Math.random() * 360) * Math.PI / 180,
+				size:1
+			}
+			drawBackground();
+		}
+		function drawBackground() {
+			ctx.beginPath();
+			ctx.globalAlpha = 1;
+			ctx.fillStyle = "rgb(12, 86, 147)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.closePath();
+		}
+		function mainloop() {
+			fps.check();
+			update();
+			draw();
+			fps.show();
+			setTimeout(mainloop, fps.getInterval());
+		}
+		function update() {
+			point.radian += 5 * Math.PI / 180;
+			point.cx = Math.cos(point.radian) * point.size;
+			point.cy = Math.sin(point.radian) * point.size;
+			point.size += sizeProgress;
+		}
+		function draw() {
+			if (point.size > canvas.width / 2 || point.size < 0) {
+				return;
+			}
+			ctx.save();
+			ctx.translate(canvas.width / 2, canvas.height / 2);
+			ctx.globalAlpha = 0.2;
+			ctx.fillStyle = "white";
+			ctx.beginPath();
+			ctx.arc(point.cx, point.cy, 2, 0, Math.PI * 2, true);
+			ctx.fill();
+			ctx.closePath();
+			ctx.restore();
+		}
+		function reverse(input) {
+			reverseMode = input.checked;
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawBackground();
+			if (reverseMode) {
+				point.size = canvas.width / 2;
+				sizeProgress = -(Math.abs(sizeProgress));
+			}
+			else {
+				point.size = 1;
+				sizeProgress = Math.abs(sizeProgress);
+			}
+		}
+    </script>
+	<body>
+		<section>
+			reverse:<input type="checkbox" onchange="reverse(this)"/>
+		</section>
+		<section>
+			<canvas id="canvas" width="500" height="500">
+		</section>
+
+	</body>
+
+
+	</canvas>
+</html>

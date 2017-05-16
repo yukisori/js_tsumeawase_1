@@ -1,0 +1,168 @@
+<html>
+<head>
+	<title></title>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+
+<style type="text/css">
+
+body{
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+}
+
+body #wrapper{
+	width: 100%;
+	height: 100%;
+	position: fixed;
+    /* padding-top: 14px; */
+    background: url(images/bg.png) top center;
+    min-height: 100%;
+}
+button{
+	position: absolute;
+	z-index: 100;
+}
+#flashWrap p{
+	position: absolute;
+	color: #4DC7D4;
+	font-size: 10px;
+}
+#load_str{
+	width:100px;
+	height:20px;
+	display: none;
+}
+#test_color{
+	background-color:#4DC7D4;
+}
+</style>
+<script type="text/javascript">
+
+
+var ctx;
+var plineH;
+var plineW;
+var flashMsgInterval;
+var drawInterval;
+var locX = 0;
+var locY = 0;
+var opc  = 0;
+
+
+var optional = {
+	elem:    "#canvas",
+	icolor:  "#4DC7D4",
+	flashMs: "Now Loading....",
+	interval:20,
+	speed:   20,
+}
+window.onload = function() {
+	ctxInit();
+	sizing();
+	flashMsgInterval = setInterval(flashDraw, 0.1);
+	drawInterval     = setInterval(draw, 20);
+
+};
+/**レスポンシブ対応**/
+$(window).resize(function() {
+	sizing();
+});
+
+function ctxInit(){
+	ctx = $(optional.elem)[0].getContext("2d");
+	msgInit();
+}
+function msgInit(){
+
+    $('#wrapper').prepend(
+        "<div id='flashWrap'><p id='load_str'>"
+        + optional.flashMs
+        +"</p></div>"
+    )
+}
+function sizing(){
+	plineH = $("#wrapper").height();
+	plineW = $("#wrapper").width();
+	$(optional.elem).attr({height:plineH});
+	$(optional.elem).attr({width:plineW});
+
+	var setTop   = plineH / 2;
+	var setLeft  = plineW / 2;
+
+	var  loadH  = $("#load_str").height();
+	var  loadW  = $("#load_str").width();
+    $("#load_str").css("left", setLeft + loadW/2);
+    $("#load_str").css("top",  setTop);
+}
+function draw(){
+	ctx.beginPath();
+	ctx.strokeStyle = optional.icolor;
+	ctx.moveTo(locX,plineH/2);
+	if(plineW >= locX){
+		locX += optional.speed;
+	}else{
+		clearPath();
+	}
+	if(locX < (plineW/2)+ optional.speed && locX > (plineW/2)- optional.speed){
+		LedgeAction(50,100);
+	}else if(locX < (plineW/4)+ optional.speed && locX > (plineW/4)- optional.speed){
+		LedgeAction(20,20);
+	}else{
+		ctx.lineTo(locX, plineH/2);
+	}
+	ctx.closePath();
+	/* 描画 */
+	ctx.stroke();
+}
+
+
+function LedgeAction(up,down){
+		ctx.lineTo(locX, plineH/2 - up);
+		ctx.moveTo(locX,plineH/2 - up);
+		locX += optional.speed;
+		ctx.lineTo(locX, plineH/2 + down);
+		ctx.closePath();
+		ctx.moveTo(locX,plineH/2 + down);
+		locX += optional.speed;
+		ctx.lineTo(locX, plineH/2);
+		ctx.closePath();
+}
+
+function flashDraw(){
+	if(opc == 0){
+		opc = 1;
+		$("#load_str").show();
+		$("#canvas").show();
+	}else{
+		opc = 0;
+		$("#load_str").hide();
+		$("#canvas").hide();
+	}
+}
+function clearPath(){
+        ctx.save();
+        ctx.beginPath();
+        ctx.clearRect(0, 0, plineW, plineH);
+        ctx.restore();
+		locX = 0;
+}
+
+function clearCtx(){
+	clearPath();
+	clearInterval(flashMsgInterval);
+	$('#canvas').fadeOut();
+	$('#flashWrap').fadeOut();
+}
+
+
+</script>
+
+<div id="wrapper">
+<canvas id="canvas"></canvas>
+</div>
+<button onClick="clearCtx()">del</button>
+</body>
+</html>
